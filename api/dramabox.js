@@ -11,25 +11,26 @@ export default async function handler(req, res) {
 
     const url = `https://dramabox.sansekai.my.id/?dramaId=${dramaId}`;
 
-    const response = await fetch(url);
+    const response = await fetch(url, {
+      headers: {
+        "User-Agent": "Mozilla/5.0",
+        "Accept": "text/html"
+      }
+    });
 
-    if (!response.ok) {
-      throw new Error(`Dramabox error: ${response.status}`);
-    }
-
-    const data = await response.json();
+    const html = await response.text();
 
     return res.status(200).json({
       success: true,
       dramaId,
-      data
+      rawType: "html",
+      htmlSnippet: html.slice(0, 3000)
     });
 
   } catch (error) {
     return res.status(500).json({
       success: false,
-      message: "Serverless function crashed",
-      detail: error.message
+      message: error.message
     });
   }
 }
